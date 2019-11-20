@@ -2,24 +2,24 @@ import * as React from "react"
 
 type TodoProps = Todo & { onClick: () => void }
 export const Todo: React.FC<TodoProps> = p => (
-    <li
+    <span
         onClick={p.onClick}
         style={{
             textDecoration: p.completed ? "line-through" : "none",
             cursor: p.completed ? "default" : "pointer"
         }}>
         {p.text}
-    </li>
+    </span>
 )
 
-type TodoListProps = {
-    onToggle: (todo: Todo) => void
-    todos: Todo[]
-}
+type TodoListProps = { onToggle: F1<Todo>; onRemove: F1<Todo>; todos: Todo[] }
 export const TodoList: React.FC<TodoListProps> = p => (
     <ul>
         {p.todos.map(t => (
-            <Todo key={t.uuid} {...t} onClick={() => p.onToggle(t)} />
+            <li key={t.uuid}>
+                <Todo {...t} onClick={() => p.onToggle(t)} />
+                <button onClick={() => p.onRemove(t)}>remove</button>
+            </li>
         ))}
     </ul>
 )

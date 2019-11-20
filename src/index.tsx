@@ -10,10 +10,10 @@ const store = createStore(reducer as any, initialState, installDevTools())
 
 render(
     <Provider store={store}>
-        <h4>React Hooks Datascript example</h4>
-        <ReactApp />
         <h4>Redux Datascript example</h4>
         <ReduxApp />
+        <h4>React Hooks Datascript example</h4>
+        <ReactApp />
     </Provider>,
     document.getElementById("root")
 )

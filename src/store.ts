@@ -7,7 +7,8 @@ const Todo = (text: string): Todo => ({ text, completed: false, uuid: v4(), crea
 
 export const actions = {
     addTodo: (text: string) => createAction("addTodo", text),
-    toggleTodo: (todo: Todo) => createAction("toggleTodo", todo)
+    toggleTodo: (todo: Todo) => createAction("toggleTodo", todo),
+    removeTodo: (todo: Todo) => createAction("removeTodo", todo)
 }
 
 export type Actions = ReturnType<typeof actions[keyof typeof actions]>
@@ -15,6 +16,17 @@ export type Actions = ReturnType<typeof actions[keyof typeof actions]>
 export const addTodoCmd = (db: DatascriptDB, text: string) => {
     const datums = toDatums("todo", Todo(text)).map(d => [":db/add", -1, d.a, d.v])
     return transact(db, datums)
+}
+
+export const filter = (db: DatascriptDB, datom: Datum, uuid: string) => {
+    const e = ds.entity<Todo>(db, datom.e)
+    return e && e.get(DPath("todo", "uuid")) !== uuid
+}
+
+export const removeTodoCmd = (db: DatascriptDB, todo: Todo) => {
+    const res = find<Todo, [string]>(db)(["eid"], [[{ "?": "eid" }, DPath("todo", "uuid"), todo.uuid]])
+    const datums = toDatums("todo", todo).map(d => [":db/retract", res[0][0], d.a, d.v])
+    return ds.db_with(db, datums)
 }
 
 export const toggleTodoCmd = (db: DatascriptDB, todo: Todo) => {
@@ -37,6 +49,7 @@ export const getTodosCmd = (db: DatascriptDB): Todo[] => {
 }
 
 export const initialState = ds.empty_db()
+// const schema = { ":todo/uuid": { ":db/unique": ":db.unique/identity" } }
 export const reducer = (db: DatascriptDB, action: Actions): DatascriptDB => {
     switch (action.type) {
         case "addTodo":
@@ -44,6 +57,9 @@ export const reducer = (db: DatascriptDB, action: Actions): DatascriptDB => {
 
         case "toggleTodo":
             return toggleTodoCmd(db, action.payload)
+
+        case "removeTodo":
+            return removeTodoCmd(db, action.payload)
     }
     return db
 }
