@@ -1,0 +1,11 @@
+yarn-error.log
+node_modules
+dist
+*.env
+npm-debug.log
+coverage
+**/*.log
+**/*.swp
+**/*.map
+*~
+.DS_Store
