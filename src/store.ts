@@ -18,7 +18,7 @@ export const addTodoCmd = (db: DatascriptDB, text: string) => {
     return transact(db, datums)
 }
 
-export const filter = (db: DatascriptDB, datom: Datum, uuid: string) => {
+export const filter = (uuid: string) => (db: DatascriptDB, datom: Datum) => {
     const e = ds.entity<Todo>(db, datom.e)
     return e && e.get(DPath("todo", "uuid")) !== uuid
 }
@@ -26,6 +26,7 @@ export const filter = (db: DatascriptDB, datom: Datum, uuid: string) => {
 export const removeTodoCmd = (db: DatascriptDB, todo: Todo) => {
     const res = find<Todo, [string]>(db)(["eid"], [[{ "?": "eid" }, DPath("todo", "uuid"), todo.uuid]])
     const datums = toDatums("todo", todo).map(d => [":db/retract", res[0][0], d.a, d.v])
+    // return ds.filter(db, filter(todo.uuid))
     return ds.db_with(db, datums)
 }
 
